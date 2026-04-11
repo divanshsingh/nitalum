@@ -1,56 +1,92 @@
 const GALLERY = [
-  { id: 1, color: "#FF6B6B", year: "2019", label: "Farewell Night"   },
-  { id: 2, color: "#4ECDC4", year: "2020", label: "Annual Fest"      },
-  { id: 3, color: "#FFE66D", year: "2021", label: "Convocation"      },
-  { id: 4, color: "#A8E6CF", year: "2022", label: "Reunion"          },
-  { id: 5, color: "#FF8B94", year: "2023", label: "Alumni Meet"      },
-  { id: 6, color: "#B4A7D6", year: "2018", label: "Cultural Night"   },
+  { id: 1, color: "#FF4D4D", year: "2019", label: "Farewell Night"  },
+  { id: 2, color: "#111111", year: "2020", label: "Annual Fest"     },
+  { id: 3, color: "#FFD600", year: "2021", label: "Convocation"     },
+  { id: 4, color: "#111111", year: "2022", label: "Reunion"         },
+  { id: 5, color: "#FF4D4D", year: "2023", label: "Alumni Meet"     },
+  { id: 6, color: "#111111", year: "2018", label: "Cultural Night"  },
 ];
 
 export default function Gallery() {
   return (
-    <section style={{ background: "#0f0f23", padding: "5rem 2rem", textAlign: "center" }}>
-      <p style={{ fontSize: "11px", color: "#FF6B6B", letterSpacing: "4px", textTransform: "uppercase", fontFamily: "'Courier New', monospace", marginBottom: "0.5rem" }}>Memories</p>
-      <h2 style={{ fontSize: "clamp(28px, 5vw, 44px)", fontWeight: 800, color: "#fff", fontFamily: "'Playfair Display', Georgia, serif", margin: "0 0 0.75rem" }}>
-        Our <span style={{ color: "#FFE66D" }}>Moments</span>
-      </h2>
-      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "13px", fontFamily: "'Courier New', monospace", marginBottom: "3rem" }}>
-        Photos uploaded by admin will appear here
-      </p>
- 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-        gap: "16px", maxWidth: "1100px", margin: "0 auto",
-      }}>
-        {GALLERY.map((item, i) => (
-          <div key={item.id} style={{
-            borderRadius: "14px", overflow: "hidden",
-            height: i % 3 === 1 ? "300px" : "220px",
-            position: "relative", cursor: "pointer",
-            background: `${item.color}18`,
-            border: `1px solid ${item.color}33`,
-            transition: "transform 0.3s, box-shadow 0.3s",
-          }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-6px) scale(1.02)"; e.currentTarget.style.boxShadow = `0 20px 40px ${item.color}33`; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0) scale(1)"; e.currentTarget.style.boxShadow = "none"; }}
-          >
-            <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px" }}>
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="1.5" strokeLinecap="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <circle cx="8.5" cy="8.5" r="1.5" />
-                <polyline points="21 15 16 10 5 21" />
-              </svg>
-              <span style={{ fontSize: "11px", color: item.color, letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>{item.label}</span>
-            </div>
-            <div style={{
-              position: "absolute", top: "12px", left: "12px",
-              background: `${item.color}25`, border: `1px solid ${item.color}55`,
-              borderRadius: "50px", padding: "3px 10px",
-              fontSize: "11px", color: item.color, fontFamily: "'Courier New', monospace",
-            }}>{item.year}</div>
+    <section style={{ background: "#fafaf8", padding: "5rem 2rem" }}>
+      <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
+
+        {/* Section header */}
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: "3rem", flexWrap: "wrap", gap: "1rem" }}>
+          <div>
+            <p style={{ fontSize: "10px", color: "#FF4D4D", letterSpacing: "3px", textTransform: "uppercase", fontFamily: "'Courier New', monospace", marginBottom: "0.4rem" }}>— Memories</p>
+            <h2 style={{ fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 900, color: "#111", fontFamily: "'Georgia', serif", margin: 0, letterSpacing: "-1px" }}>
+              Our Moments
+            </h2>
           </div>
-        ))}
+          <p style={{ fontSize: "12px", color: "#aaa", fontFamily: "'Courier New', monospace", maxWidth: "260px", lineHeight: 1.6 }}>
+            Photos uploaded by admin appear here. Real memories, real people.
+          </p>
+        </div>
+
+        {/* Grid */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateRows: "auto",
+          gap: "12px",
+        }}>
+          {GALLERY.map((item, i) => {
+            const isAccent = item.color !== "#111111";
+            const tall = i === 1 || i === 4;
+            return (
+              <div key={item.id} style={{
+                borderRadius: "12px", overflow: "hidden",
+                height: tall ? "320px" : "220px",
+                position: "relative", cursor: "pointer",
+                background: isAccent ? item.color : "#f0efeb",
+                border: "1px solid #e8e8e4",
+                transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                gridRow: tall ? "span 1" : "span 1",
+              }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.1)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}
+              >
+                {/* Content */}
+                <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "10px" }}>
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"
+                    stroke={isAccent ? "rgba(255,255,255,0.7)" : "#bbb"}
+                    strokeWidth="1.5" strokeLinecap="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <polyline points="21 15 16 10 5 21" />
+                  </svg>
+                  <span style={{
+                    fontSize: "11px", letterSpacing: "2px", textTransform: "uppercase",
+                    fontFamily: "'Courier New', monospace",
+                    color: isAccent ? "rgba(255,255,255,0.8)" : "#bbb",
+                  }}>{item.label}</span>
+                </div>
+
+                {/* Year badge */}
+                <div style={{
+                  position: "absolute", top: "12px", left: "12px",
+                  background: isAccent ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.06)",
+                  borderRadius: "50px", padding: "3px 10px",
+                  fontSize: "11px", fontFamily: "'Courier New', monospace",
+                  color: isAccent ? "#fff" : "#999",
+                  letterSpacing: "1px",
+                }}>{item.year}</div>
+
+                {/* Hover overlay */}
+                <div style={{
+                  position: "absolute", inset: 0,
+                  background: "rgba(0,0,0,0)",
+                  transition: "background 0.3s",
+                }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0.04)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "rgba(0,0,0,0)")}
+                />
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

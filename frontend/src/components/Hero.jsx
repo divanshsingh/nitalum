@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
+import Marquee from './Marque';
 
 const STATS = [
-  { value: 200, suffix: "+", label: "Alumni Connected" },
-  { value: 15,  suffix: "",  label: "Batches"          },
-  { value: 80,  suffix: "+", label: "Companies"        },
-  { value: 12,  suffix: "",  label: "Countries"        },
+  { value: 200, suffix: "+", label: "Alumni"    },
+  { value: 15,  suffix: "",  label: "Batches"   },
+  { value: 80,  suffix: "+", label: "Companies" },
+  { value: 12,  suffix: "",  label: "Countries" },
 ];
 
 const COMPANIES = [
@@ -12,40 +13,6 @@ const COMPANIES = [
   "Wipro", "Accenture", "Samsung", "IBM", "Deloitte",
   "Cognizant", "Capgemini",
 ];
-
-function StatCard({ value, suffix, label, animate }) {
-  const count = useCounter(value, 1600, animate);
-  return (
-    <div style={{
-      textAlign: "center",
-      padding: "1.5rem 2rem",
-      background: "rgba(255,255,255,0.12)",
-      borderRadius: "16px",
-      backdropFilter: "blur(8px)",
-      border: "1px solid rgba(255,255,255,0.25)",
-      minWidth: "140px",
-      flex: "1",
-    }}>
-      <div style={{
-        fontSize: "clamp(32px, 5vw, 48px)",
-        fontWeight: 800,
-        color: "#fff",
-        fontFamily: "'Playfair Display', Georgia, serif",
-        lineHeight: 1,
-      }}>
-        {animate ? count : 0}{suffix}
-      </div>
-      <div style={{
-        fontSize: "13px",
-        color: "rgba(255,255,255,0.75)",
-        marginTop: "6px",
-        letterSpacing: "1.5px",
-        textTransform: "uppercase",
-        fontFamily: "'Courier New', monospace",
-      }}>{label}</div>
-    </div>
-  );
-}
 
 function useCounter(target, duration = 1800, start = false) {
   const [count, setCount] = useState(0);
@@ -63,103 +30,190 @@ function useCounter(target, duration = 1800, start = false) {
   return count;
 }
 
+function StatCard({ value, suffix, label, animate }) {
+  const count = useCounter(value, 1600, animate);
+  return (
+    <div style={{
+      textAlign: "center",
+      padding: "1.2rem 1.5rem",
+      borderRight: "1px solid #e8e8e4",
+      flex: 1,
+    }}>
+      <div style={{
+        fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 900,
+        color: "#111", fontFamily: "'Georgia', serif", lineHeight: 1,
+      }}>
+        {animate ? count : 0}{suffix}
+      </div>
+      <div style={{
+        fontSize: "11px", color: "#999", marginTop: "5px",
+        letterSpacing: "2px", textTransform: "uppercase",
+        fontFamily: "'Courier New', monospace",
+      }}>{label}</div>
+    </div>
+  );
+}
+
 export default function Hero() {
   const [animate, setAnimate] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setAnimate(true), 400); return () => clearTimeout(t); }, []);
- 
+  useEffect(() => { const t = setTimeout(() => setAnimate(true), 300); return () => clearTimeout(t); }, []);
+
   return (
-    <section style={{
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #0f0f23 0%, #1a1a3e 40%, #0d2137 70%, #0f0f23 100%)",
-      display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      padding: "7rem 2rem 4rem", position: "relative",
-      overflow: "hidden", textAlign: "center",
-    }}>
-      {/* Decorative blobs */}
-      <div style={{ position: "absolute", top: "15%", left: "8%", width: "320px", height: "320px", borderRadius: "50%", background: "radial-gradient(circle, rgba(255,107,107,0.18) 0%, transparent 70%)", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", bottom: "20%", right: "6%", width: "280px", height: "280px", borderRadius: "50%", background: "radial-gradient(circle, rgba(78,205,196,0.15) 0%, transparent 70%)", pointerEvents: "none" }} />
- 
-      {/* Badge */}
+    <>
+      {/* Main hero */}
+      <section style={{
+        minHeight: "100vh", background: "#fafaf8",
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        padding: "7rem 2rem 3rem",
+        position: "relative", overflow: "hidden",
+        textAlign: "center",
+      }}>
+        {/* Subtle grain texture overlay */}
+        <div style={{
+          position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0,
+          backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E\")",
+          backgroundSize: "256px 256px", opacity: 0.4,
+        }} />
+
+        {/* Pop accent — top right dot */}
+        <div style={{
+          position: "absolute", top: "18%", right: "12%",
+          width: "14px", height: "14px", borderRadius: "50%",
+          background: "#FF4D4D", zIndex: 1,
+        }} />
+        {/* Pop accent — bottom left dot */}
+        <div style={{
+          position: "absolute", bottom: "22%", left: "10%",
+          width: "9px", height: "9px", borderRadius: "50%",
+          background: "#FFD600", zIndex: 1,
+        }} />
+
+        <div style={{ position: "relative", zIndex: 2, maxWidth: "820px" }}>
+          {/* Badge */}
+          <div style={{
+            display: "inline-block",
+            border: "1px solid #ddd", borderRadius: "50px",
+            padding: "5px 16px", marginBottom: "2rem",
+            opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(16px)",
+            transition: "all 0.5s ease",
+          }}>
+            <span style={{ fontSize: "11px", color: "#888", letterSpacing: "2px", fontFamily: "'Courier New', monospace", textTransform: "uppercase" }}>
+              NIT Agartala · Alumni Network
+            </span>
+          </div>
+
+          {/* Headline */}
+          <h1 style={{
+            fontSize: "clamp(42px, 8vw, 88px)", fontWeight: 900,
+            color: "#111", fontFamily: "'Georgia', serif",
+            lineHeight: 1.05, margin: "0 0 1.5rem",
+            letterSpacing: "-2px",
+            opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(24px)",
+            transition: "all 0.6s ease 0.1s",
+          }}>
+            Rewind.{" "}
+            <span style={{ color: "#FF4D4D", fontStyle: "italic" }}>Reconnect.</span>
+            <br />Refer.
+          </h1>
+
+          {/* Subtext */}
+          <p style={{
+            fontSize: "clamp(14px, 1.8vw, 18px)", color: "#777",
+            maxWidth: "480px", margin: "0 auto 2.5rem",
+            lineHeight: 1.75, fontFamily: "'Courier New', monospace",
+            opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(16px)",
+            transition: "all 0.6s ease 0.2s",
+          }}>
+            One platform for every NITA alumnus — celebrate memories, find batchmates, and grow together.
+          </p>
+
+          {/* CTA */}
+          <div style={{
+            opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(16px)",
+            transition: "all 0.6s ease 0.3s",
+          }}>
+            <a href="#" style={{
+              display: "inline-block",
+              background: "#111", color: "#fff",
+              fontSize: "14px", fontWeight: 600,
+              padding: "14px 36px", borderRadius: "50px",
+              textDecoration: "none", letterSpacing: "1px",
+              fontFamily: "'Courier New', monospace",
+              transition: "all 0.25s",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+            }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#FF4D4D"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 8px 28px rgba(255,77,77,0.35)"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#111"; e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,0,0,0.12)"; }}
+            >Discover →</a>
+          </div>
+        </div>
+      </section>
+
+      {/* Marquee band */}
+      <Marquee />
+
+      {/* Stats bar */}
       <div style={{
-        display: "inline-flex", alignItems: "center", gap: "8px",
-        background: "rgba(255,230,109,0.12)", border: "1px solid rgba(255,230,109,0.3)",
-        borderRadius: "50px", padding: "6px 18px", marginBottom: "1.5rem",
-        opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.6s ease",
+        background: "#fafaf8",
+        borderBottom: "1px solid #e8e8e4",
+        padding: "2.5rem 2rem",
       }}>
-        <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#FFE66D" }} />
-        <span style={{ fontSize: "12px", color: "#FFE66D", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>
-          National Institute of Technology Agartala
-        </span>
+        <div style={{
+          maxWidth: "860px", margin: "0 auto",
+          display: "flex", flexWrap: "wrap",
+        }}>
+          {STATS.map((s, i) => (
+            <div key={s.label} style={{
+              flex: 1, textAlign: "center", padding: "1rem 1.5rem",
+              borderRight: i < STATS.length - 1 ? "1px solid #e8e8e4" : "none",
+            }}>
+              <div style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 900, color: "#111", fontFamily: "'Georgia', serif", lineHeight: 1 }}>
+                <CountUp target={s.value} suffix={s.suffix} />
+              </div>
+              <div style={{ fontSize: "11px", color: "#999", marginTop: "5px", letterSpacing: "2px", textTransform: "uppercase", fontFamily: "'Courier New', monospace" }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
       </div>
- 
-      {/* Tagline */}
-      <h1 style={{
-        fontSize: "clamp(38px, 7vw, 72px)", fontWeight: 900, color: "#fff",
-        fontFamily: "'Playfair Display', Georgia, serif",
-        lineHeight: 1.1, margin: "0 0 1.2rem", maxWidth: "800px",
-        opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(30px)",
-        transition: "all 0.7s ease 0.1s",
-      }}>
-        Rewind,{" "}
-        <span style={{ color: "#FF6B6B" }}>Reconnect,</span>
-        <br />and{" "}
-        <span style={{ background: "linear-gradient(90deg,#FFE66D,#FF6B6B)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Refer.</span>
-      </h1>
- 
-      <p style={{
-        fontSize: "clamp(14px, 2vw, 18px)", color: "rgba(255,255,255,0.6)",
-        maxWidth: "520px", lineHeight: 1.7, marginBottom: "3rem",
-        fontFamily: "'Courier New', monospace",
-        opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.7s ease 0.2s",
-      }}>
-        One platform for every NITA alumnus — celebrate memories, discover batchmates, and grow together.
-      </p>
- 
-      {/* Stats */}
-      <div style={{
-        display: "flex", flexWrap: "wrap", gap: "16px",
-        justifyContent: "center", marginBottom: "3.5rem",
-        opacity: animate ? 1 : 0, transform: animate ? "translateY(0)" : "translateY(20px)",
-        transition: "all 0.7s ease 0.3s",
-      }}>
-        {STATS.map((s) => <StatCard key={s.label} {...s} animate={animate} />)}
-      </div>
- 
+
       {/* Company strip */}
-      <div style={{ opacity: animate ? 1 : 0, transition: "opacity 0.7s ease 0.5s", width: "100%", maxWidth: "700px" }}>
-        <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.35)", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "1rem", fontFamily: "'Courier New', monospace" }}>
+      <div style={{ background: "#fafaf8", padding: "3rem 2rem", textAlign: "center", borderBottom: "1px solid #e8e8e4" }}>
+        <p style={{ fontSize: "10px", color: "#bbb", letterSpacing: "3px", textTransform: "uppercase", marginBottom: "1.2rem", fontFamily: "'Courier New', monospace" }}>
           Our alumni work at
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center", maxWidth: "700px", margin: "0 auto" }}>
           {COMPANIES.map((co) => (
             <div key={co} style={{
-              padding: "7px 16px",
-              background: "rgba(255,255,255,0.07)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              padding: "6px 16px",
+              border: "1px solid #e8e8e4",
               borderRadius: "50px", fontSize: "12px",
-              color: "rgba(255,255,255,0.7)",
-              fontFamily: "'Courier New', monospace",
+              color: "#666", fontFamily: "'Courier New', monospace",
               transition: "all 0.2s", cursor: "default",
+              background: "#fff",
             }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,230,109,0.12)"; e.currentTarget.style.color = "#FFE66D"; e.currentTarget.style.borderColor = "rgba(255,230,109,0.4)"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.07)"; e.currentTarget.style.color = "rgba(255,255,255,0.7)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = "#111"; e.currentTarget.style.color = "#fff"; e.currentTarget.style.borderColor = "#111"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = "#fff"; e.currentTarget.style.color = "#666"; e.currentTarget.style.borderColor = "#e8e8e4"; }}
             >{co}</div>
           ))}
         </div>
       </div>
- 
-      {/* Scroll hint */}
-      <div style={{
-        position: "absolute", bottom: "2rem", left: "50%", transform: "translateX(-50%)",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: "6px",
-        opacity: 0.4, animation: "bounce 2s infinite",
-      }}>
-        <span style={{ fontSize: "10px", color: "#fff", letterSpacing: "2px", fontFamily: "'Courier New', monospace" }}>SCROLL</span>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M7 10l5 5 5-5z" /></svg>
-      </div>
-    </section>
+    </>
   );
+}
+
+function CountUp({ target, suffix }) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let startTime = null;
+    const step = (ts) => {
+      if (!startTime) startTime = ts;
+      const progress = Math.min((ts - startTime) / 1600, 1);
+      setCount(Math.floor(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    const timer = setTimeout(() => requestAnimationFrame(step), 600);
+    return () => clearTimeout(timer);
+  }, [target]);
+  return <>{count}{suffix}</>;
 }
