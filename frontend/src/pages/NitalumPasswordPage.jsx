@@ -101,6 +101,7 @@ export default function NitalumPasswordPage() {
     if (role === "member") {
       setMessage({ text: "✓ Welcome!", type: "success" });
       sessionStorage.setItem("role", "member");
+      sessionStorage.setItem("username", "arjun_sharma");
       setTimeout(() => navigate("/home"), 800);
     } else if (role === "admin") {
       setMessage({ text: "✓ Welcome, Admin!", type: "success" });

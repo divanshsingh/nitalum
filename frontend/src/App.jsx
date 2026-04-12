@@ -24,7 +24,7 @@ export default function App() {
         <Route path="/home" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
         <Route path="/batch/:year" element={<ProtectedRoute><BatchPage /></ProtectedRoute>} />
         <Route path="/add-profile" element={<ProtectedRoute><AddProfilePage /></ProtectedRoute>} />        
-        <Route path="/profile/:userNo" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
 
         {/* Admin only */}
         <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPage /></ProtectedRoute>} />

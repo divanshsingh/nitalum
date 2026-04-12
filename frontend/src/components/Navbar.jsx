@@ -16,6 +16,15 @@ export default function Navbar({ onLogout }) {
   const dropRef  = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const [myUserName, setMyUsername] = useState(sessionStorage.getItem("username"));
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setMyUsername(sessionStorage.getItem("username"));
+  }, 300);
+  return () => clearInterval(interval);
+}, []);
+
 
   const isBatchActive = location.pathname.startsWith("/batch");
 
@@ -76,7 +85,7 @@ export default function Navbar({ onLogout }) {
       >NITALUM.</div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "2rem" }}>
-        {navLink("Home", "/home")}
+        {/* {navLink("Home", "/home")} */}
         {navLink("About Us", "/about")}
 
         {/* Batches dropdown */}
@@ -147,6 +156,23 @@ export default function Navbar({ onLogout }) {
           onMouseLeave={(e) => { e.currentTarget.style.background = "#111"; e.currentTarget.style.transform = "translateY(0)"; }}
         >+ Be A Member</button>
 
+        {/* {Profile} */}
+        {myUserName && (
+  <button
+    onClick={() => navigate(`/profile/${myUserName}`)}
+    style={{
+      background: "transparent",
+      border: "1px solid #e8e8e4",
+      color: "#555", fontSize: "12px",
+      padding: "8px 16px", borderRadius: "50px",
+      cursor: "pointer", fontFamily: "'Courier New', monospace",
+      letterSpacing: "0.5px", transition: "all 0.2s",
+    }}
+    onMouseEnter={(e) => { e.currentTarget.style.background = "#111"; e.currentTarget.style.color = "#fff"; }}
+    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#555"; }}
+  >My Profile</button>
+)}
+
         {/* Logout */}
         <button
           onClick={onLogout}
@@ -157,7 +183,7 @@ export default function Navbar({ onLogout }) {
           }}
           onMouseEnter={(e) => (e.currentTarget.style.color = "#111")}
           onMouseLeave={(e) => (e.currentTarget.style.color = "#bbb")}
-        >Logout</button>
+        >Logout</button>       
       </div>
     </nav>
   );
