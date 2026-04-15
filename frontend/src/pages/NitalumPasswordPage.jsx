@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-const PASSWORDS = {
-  nitalum2024: "member",
-  nitalumADMIN: "admin",
-};
+// const PASSWORDS = {
+//   nitalum2024: "member",
+//   nitalumADMIN: "admin",
+// };
 
 const SLIDES = [
   { id: 1, color: "#c9b99a", label: "Class Photo" },
@@ -92,26 +92,28 @@ export default function NitalumPasswordPage() {
 
   useEffect(() => { startAuto(); return () => clearInterval(autoRef.current); }, [startAuto]);
 
-  const handleSubmit = () => {
-    if (!password) {
-      setMessage({ text: "Please enter the password.", type: "error" });
-      triggerShake(); return;
-    }
-    const role = PASSWORDS[password];
-    if (role === "member") {
-      setMessage({ text: "✓ Welcome!", type: "success" });
-      sessionStorage.setItem("role", "member");
-      sessionStorage.setItem("username", "arjun_sharma");
-      setTimeout(() => navigate("/home"), 800);
-    } else if (role === "admin") {
-      setMessage({ text: "✓ Welcome, Admin!", type: "success" });
-      sessionStorage.setItem("role", "admin");
-      setTimeout(() => navigate("/admin"), 800);
+const handleSubmit = async () => {
+  try {
+    const response = await fetch("http://localhost:8081/api/auth/gate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      sessionStorage.setItem("role", data.role);
+      // Redirect based on role
+      navigate(data.role === "admin" ? "/admin" : "/home");
     } else {
-      setMessage({ text: "Incorrect password. Please try again.", type: "error" });
-      setPassword(""); triggerShake();
+      setMessage({ text: data.msg, type: "error" });
+      triggerShake();
     }
-  };
+  } catch (err) {
+    setMessage({ text: "Backend not running!", type: "error" });
+  }
+};
 
   const triggerShake = () => { setShake(true); setTimeout(() => setShake(false), 500); };
 

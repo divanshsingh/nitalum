@@ -3,12 +3,26 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 
 const BATCHES = [
-  "2015–19",
-  "2016–20",
-  "2017–21",
-  "2018–22",
-  "2019–23",
-  "2020–24",
+  "2025–28",
+  "2024–27",
+  "2023–26",
+  "2022–25",
+  "2021–24",
+  "2020–23",
+  "2019–22",
+  "2018–21",
+  "2017–20",
+  "2016–19",
+  "2015–18",
+  "2014–17",
+  "2013–16",
+  "2012–15",
+  "2011–14",
+  "2010–13",
+  "2009–12",
+  "2008–11",
+  "2007–10",
+  "2006–09"
 ];
 
 const ROLES = [
@@ -555,41 +569,25 @@ export default function AddProfilePage() {
               />
             </Field>
 
-            <Field
+            <Field 
               label="Username"
               required
               hint="Your profile URL: nitalum.com/profile/username · Only letters, numbers, underscore"
-              error={errors.username}
-            >
-              <div style={{ position: "relative" }}>
-                <span
-                  style={{
-                    position: "absolute",
-                    left: "14px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    fontSize: "13px",
-                    color: "#aaa",
-                    fontFamily: "'Courier New', monospace",
-                  }}
-                >
-                  @
-                </span>
-                <Input
-                  placeholder="arjun_sharma"
-                  value={form.username}
+              error={errors.username}              
+              >
+              <Input
+                placeholder="e.g. divansh_xml"
+                value={form.username}
                   onChange={(e) => {
                     const val = e.target.value
                       .toLowerCase()
                       .replace(/[^a-z0-9_]/g, "");
                     setForm((f) => ({ ...f, username: val }));
                     setMessage(null);
-                  }}
-                  error={errors.username}
-                  style={{ paddingLeft: "28px" }}
-                />
-              </div>
-            </Field>
+                  }}                
+                error={errors.name}
+              />
+            </Field>            
 
             <Field label="Batch" required error={errors.batch}>
               <Select
@@ -607,7 +605,7 @@ export default function AddProfilePage() {
             </Field>
           </div>
 
-          {/* ── Professional ── */}
+          {/* ── Professional ──
           <SectionTitle>Professional Info</SectionTitle>
 
           <div
@@ -668,7 +666,7 @@ export default function AddProfilePage() {
                 error={errors.linkedin}
               />
             </Field>
-          </div>
+          </div> */}
 
           {/* ── Account ── */}
           <SectionTitle>Account Setup</SectionTitle>

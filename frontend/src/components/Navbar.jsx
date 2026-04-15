@@ -2,12 +2,26 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const BATCHES = [
-  { label: "2015–19", path: "/batch/2015" },
-  { label: "2016–20", path: "/batch/2016" },
-  { label: "2017–21", path: "/batch/2017" },
-  { label: "2018–22", path: "/batch/2018" },
-  { label: "2019–23", path: "/batch/2019" },
-  { label: "2020–24", path: "/batch/2020" },
+  { label: "2025–28", path: "/batch/2025" },
+  { label: "2024–27", path: "/batch/2024" },
+  { label: "2023–26", path: "/batch/2023" },
+  { label: "2022–25", path: "/batch/2022" },
+  { label: "2021–24", path: "/batch/2021" },
+  { label: "2020–23", path: "/batch/2020" },
+  { label: "2019–22", path: "/batch/2019" },
+  { label: "2018–21", path: "/batch/2018" },
+  { label: "2017–20", path: "/batch/2017" },
+  { label: "2016–19", path: "/batch/2016" },
+  { label: "2015–18", path: "/batch/2015" },
+  { label: "2014–17", path: "/batch/2014" },
+  { label: "2013–16", path: "/batch/2013" },
+  { label: "2012–15", path: "/batch/2012" },
+  { label: "2011–14", path: "/batch/2011" },
+  { label: "2010–13", path: "/batch/2010" },
+  { label: "2009–12", path: "/batch/2009" },
+  { label: "2008–11", path: "/batch/2008" },
+  { label: "2007–10", path: "/batch/2007" },
+  { label: "2006–09", path: "/batch/2006" }
 ];
 
 export default function Navbar({ onLogout }) {
@@ -118,6 +132,9 @@ useEffect(() => {
               background: "#fff", border: "1px solid #e8e8e4",
               borderRadius: "10px", padding: "6px 0", minWidth: "130px",
               boxShadow: "0 8px 30px rgba(0,0,0,0.08)", zIndex: 200,
+              maxHeight: '300px',
+              overflowY: "auto",
+              scrollbarWidth: "thin"
             }}>
               {BATCHES.map((b) => {
                 const active = location.pathname === b.path;
