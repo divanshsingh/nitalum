@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const authRoutes = require("./routes/auth");
 const alumniRoutes = require('./routes/alumni');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -35,6 +36,8 @@ app.post('/api/auth/gate', (req, res) => {
 app.use('/api/auth', authRoutes);
 
 app.use('/api/alumni', alumniRoutes);
+
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 8081;
 

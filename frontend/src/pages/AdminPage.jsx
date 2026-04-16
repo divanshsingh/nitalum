@@ -1,15 +1,43 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import { useEffect } from "react";
 
-// ─── mock data ────────────────────────────────────────────────────────────────
-const INITIAL_ALUMNI = [
-  { id: 1, name: "Arjun Sharma",    batch: "2015–19", role: "SDE-2",           company: "Google",    email: "arjun@example.com",  status: "approved", city: "Bangalore" },
-  { id: 2, name: "Priya Nair",      batch: "2015–19", role: "Product Manager", company: "Amazon",    email: "priya@example.com",  status: "approved", city: "Hyderabad" },
-  { id: 3, name: "Rahul Das",       batch: "2016–20", role: "Data Scientist",  company: "Microsoft", email: "rahul@example.com",  status: "pending",  city: "Pune"      },
-  { id: 4, name: "Sneha Gupta",     batch: "2017–21", role: "ML Engineer",     company: "Infosys",   email: "sneha@example.com",  status: "pending",  city: "Chennai"   },
-  { id: 5, name: "Vikram Roy",      batch: "2018–22", role: "DevOps Engineer", company: "TCS",       email: "vikram@example.com", status: "approved", city: "Mumbai"    },
-];
+const updateStatus = async (id, newStatus) => {
+  try {
+    const response = await fetch(`http://localhost:8081/api/admin/approve/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: newStatus })
+    });
+
+    if (response.ok) {
+      // Update local state so the UI reflects the change immediately
+      setAlumni((prev) => prev.map((a) => (a._id === id ? { ...a, status: newStatus } : a)));
+    }
+  } catch (err) {
+    alert("Error updating status");
+  }
+};
+
+  const approve = (id) => updateStatus(id, "approved");
+  const reject  = (id) => updateStatus(id, "rejected");
+  const remove = async (id) => {
+  try {
+    const response = await fetch(`http://localhost:8081/api/admin/delete/${id}`, {
+      method: "DELETE"
+    });
+
+    if (response.ok) {
+      setAlumni((prev) => prev.filter((a) => a._id !== id));
+      setConfirm(null);
+    }
+  } catch (err) {
+    alert("Could not delete user.");
+  }
+};
+
+  // Fetching all alumni from the backend
 
 const INITIAL_GALLERY = [
   { id: 1, label: "Farewell Night",  year: "2019", url: null, color: "#FF4D4D" },
@@ -91,9 +119,19 @@ function AlumniSection({ alumni, setAlumni }) {
     return matchSearch && matchFilter;
   });
 
-  const approve = (id) => setAlumni((prev) => prev.map((a) => a.id === id ? { ...a, status: "approved" } : a));
-  const reject  = (id) => setAlumni((prev) => prev.map((a) => a.id === id ? { ...a, status: "rejected" } : a));
-  const remove  = (id) => { setAlumni((prev) => prev.filter((a) => a.id !== id)); setConfirm(null); };
+    useEffect(() => {
+    const fetchAlumni = async () => {
+      try {
+        const res = await fetch("http://localhost:8081/api/admin/all"); // You'll need an 'all' route or use the existing pending one
+        const data = await res.json();
+        setAlumni(data);
+        // setLoading(setLoading(false));
+      } catch (err) {
+        console.error("Failed to fetch alumni", err);
+      }
+    };
+    fetchAlumni();
+  }, []);
 
   return (
     <div>
@@ -133,7 +171,7 @@ function AlumniSection({ alumni, setAlumni }) {
           const color = avatarColor(i);
           const light = isLight(color);
           return (
-            <div key={a.id} style={{
+            <div key={a._id} style={{
               display: "grid", gridTemplateColumns: "2fr 1fr 1.5fr 1fr 100px",
               padding: "12px 16px", borderBottom: "1px solid #f5f5f2",
               alignItems: "center", transition: "background 0.15s",
@@ -158,21 +196,21 @@ function AlumniSection({ alumni, setAlumni }) {
               {/* Actions */}
               <div style={{ display: "flex", gap: "2px" }}>
                 {a.status === "pending" && (
-                  <IconBtn onClick={() => approve(a.id)} title="Approve" color="#059669" hoverColor="#059669">
+                  <IconBtn onClick={() => approve(a._id)} title="Approve" color="#059669" hoverColor="#059669">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
                   </IconBtn>
                 )}
                 {a.status === "pending" && (
-                  <IconBtn onClick={() => reject(a.id)} title="Reject" color="#dc2626" hoverColor="#dc2626">
+                  <IconBtn onClick={() => reject(a._id)} title="Reject" color="#dc2626" hoverColor="#dc2626">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                   </IconBtn>
                 )}
                 {a.status !== "pending" && (
-                  <IconBtn onClick={() => approve(a.id)} title="Re-approve" color="#aaa">
+                  <IconBtn onClick={() => approve(a._id)} title="Re-approve" color="#aaa">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.27"/></svg>
                   </IconBtn>
                 )}
-                <IconBtn onClick={() => setConfirm(a.id)} title="Delete" color="#aaa" hoverColor="#dc2626">
+                <IconBtn onClick={() => setConfirm(a._id)} title="Delete" color="#aaa" hoverColor="#dc2626">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
                 </IconBtn>
               </div>
@@ -384,10 +422,11 @@ function PasswordSection({ passwords, setPasswords }) {
 // ─── Main AdminPage ───────────────────────────────────────────────────────────
 export default function AdminPage() {
   const navigate  = useNavigate();
-  const [tab, setTab]           = useState("alumni");
-  const [alumni, setAlumni]     = useState(INITIAL_ALUMNI);
   const [gallery, setGallery]   = useState(INITIAL_GALLERY);
   const [passwords, setPasswords] = useState(INITIAL_PASSWORDS);
+  const [tab, setTab] = useState("alumni");
+  const [alumni, setAlumni] = useState([]); // Start with an empty array
+  // const [loading, setLoading] = useState(true);
 
   const pending  = alumni.filter((a) => a.status === "pending").length;
   const approved = alumni.filter((a) => a.status === "approved").length;
