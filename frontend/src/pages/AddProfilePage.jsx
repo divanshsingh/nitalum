@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 
@@ -264,7 +264,7 @@ function AvatarUpload({ name, image, onChange }) {
             style={{ display: "none" }}
             onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) onChange(URL.createObjectURL(file));
+              if (file) onChange(file);
             }}
           />
         </label>
@@ -305,6 +305,24 @@ export default function AddProfilePage() {
   const [errors, setErrors] = useState({});
   const [showPw, setShowPw] = useState(false);
   const [showCpw, setShowCpw] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  useEffect(() => {
+    if (!form.image) {
+      setImagePreview(null);
+      return undefined;
+    }
+
+    if (typeof form.image === "string") {
+      setImagePreview(form.image);
+      return undefined;
+    }
+
+    const previewUrl = URL.createObjectURL(form.image);
+    setImagePreview(previewUrl);
+
+    return () => URL.revokeObjectURL(previewUrl);
+  }, [form.image]);
 
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
 
@@ -315,9 +333,9 @@ export default function AddProfilePage() {
     else if (!/^[a-z0-9_]+$/.test(form.username)) e.username = "Only letters, numbers, underscore";
     if (!form.name.trim()) e.name = "Full name is required";
     if (!form.batch) e.batch = "Please select your batch";
-    if (!form.company.trim()) e.company = "Company is required";
-    if (!form.role) e.role = "Please select your role";
-    if (!form.city) e.city = "Please select your city";
+    // if (!form.company.trim()) e.company = "Company is required";
+    // if (!form.role) e.role = "Please select your role";
+    // if (!form.city) e.city = "Please select your city";
     if (!form.email.trim()) e.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       e.email = "Enter a valid email";
@@ -325,20 +343,54 @@ export default function AddProfilePage() {
     else if (form.password.length < 6) e.password = "Minimum 6 characters";
     if (form.password !== form.confirmPassword)
       e.confirmPassword = "Passwords do not match";
-    if (form.linkedin && !/^https?:\/\/.+/.test(form.linkedin))
-      e.linkedin = "Must start with https://";
+    // if (form.linkedin && !/^https?:\/\/.+/.test(form.linkedin))
+    //   e.linkedin = "Must start with https://";
     return e;
   };
 
-  const handleSubmit = () => {
-    const e = validate();
-    setErrors(e);
-    if (Object.keys(e).length === 0) {
-      // TODO: POST to backend API
-      console.log("Submitting:", form);
-      setSubmitted(true);
+const handleSubmit = async () => {
+  const e = validate(); // Checks your name, email, password, etc.
+  setErrors(e);
+
+  if (Object.keys(e).length === 0) {
+    // 1. Prepare data for the backend (including the image file)
+    const formData = new FormData();
+if (form) {
+      Object.keys(form).forEach((key) => {
+        // Only append if the value exists
+        if (form[key] !== null && form[key] !== undefined) {
+          formData.append(key, form[key]);
+        }
+      });
     }
-  };
+
+    try {
+      const response = await fetch("http://localhost:8081/api/alumni/register", {
+        method: "POST",
+        body: formData, // No 'Content-Type' header needed for FormData
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // 2. LOG IN AUTOMATICALLY: Save tokens to sessionStorage
+        // data.token is the user's specific "Login Token"
+        sessionStorage.setItem("userToken", data.token);
+        sessionStorage.setItem("username", data.username);
+        
+        setSubmitted(true);
+
+        // 3. Move to their new profile page
+        setTimeout(() => navigate(`/profile/${data.username}`), 2000);
+      } else {
+        // Show server-side errors (like "Email already taken")
+        setErrors({ server: data.msg });
+      }
+    } catch (err) {
+      setErrors({ server: "Backend is not running at http://localhost:8081" });
+    }
+  }
+};
 
   // ── Success screen ────────────────────────────────────────────────────────
   if (submitted) {
@@ -402,7 +454,7 @@ export default function AddProfilePage() {
               lineHeight: 1.7,
             }}
           >
-            Welcome to NITALUM, <strong>{form.name.split(" ")[0]}</strong>! Your
+            Welcome to NITALUM, <strong>{form.name?.split(" ")[0] || "Member"}</strong>! Your
             profile is under review and will be live shortly.
           </p>
           <div style={{ display: "flex", gap: "12px", marginTop: "0.5rem" }}>
@@ -543,8 +595,8 @@ export default function AddProfilePage() {
             >
               <AvatarUpload
                 name={form.name}
-                image={form.image}
-                onChange={(url) => setForm((f) => ({ ...f, image: url }))}
+                image={imagePreview}
+                onChange={(file) => setForm((f) => ({ ...f, image: file }))}
               />
             </Field>
           </div>
@@ -583,9 +635,9 @@ export default function AddProfilePage() {
                       .toLowerCase()
                       .replace(/[^a-z0-9_]/g, "");
                     setForm((f) => ({ ...f, username: val }));
-                    setMessage(null);
+                    // setMessage(null);
                   }}                
-                error={errors.name}
+                error={errors.username}
               />
             </Field>            
 

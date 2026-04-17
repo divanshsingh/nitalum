@@ -3,40 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { useEffect } from "react";
 
-const updateStatus = async (id, newStatus) => {
-  try {
-    const response = await fetch(`http://localhost:8081/api/admin/approve/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus })
-    });
-
-    if (response.ok) {
-      // Update local state so the UI reflects the change immediately
-      setAlumni((prev) => prev.map((a) => (a._id === id ? { ...a, status: newStatus } : a)));
-    }
-  } catch (err) {
-    alert("Error updating status");
-  }
-};
-
-  const approve = (id) => updateStatus(id, "approved");
-  const reject  = (id) => updateStatus(id, "rejected");
-  const remove = async (id) => {
-  try {
-    const response = await fetch(`http://localhost:8081/api/admin/delete/${id}`, {
-      method: "DELETE"
-    });
-
-    if (response.ok) {
-      setAlumni((prev) => prev.filter((a) => a._id !== id));
-      setConfirm(null);
-    }
-  } catch (err) {
-    alert("Could not delete user.");
-  }
-};
-
   // Fetching all alumni from the backend
 
 const INITIAL_GALLERY = [
@@ -111,6 +77,50 @@ function AlumniSection({ alumni, setAlumni }) {
   const [search, setSearch]   = useState("");
   const [filter, setFilter]   = useState("all");
   const [confirm, setConfirm] = useState(null); // id to delete
+
+  const updateStatus = async (id, newStatus) => {
+    try {
+      const response = await fetch(`http://localhost:8081/api/admin/approve/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || "Error updating status");
+      }
+
+      setAlumni((prev) =>
+        prev.map((a) => (a._id === id ? { ...a, status: data.status || newStatus } : a))
+      );
+    } catch (err) {
+      alert(err.message || "Error updating status");
+    }
+  };
+
+  const approve = (id) => updateStatus(id, "approved");
+  const reject = (id) => updateStatus(id, "rejected");
+
+  const remove = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:8081/api/admin/delete/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.msg || "Could not delete user.");
+      }
+
+      setAlumni((prev) => prev.filter((a) => a._id !== id));
+      setConfirm(null);
+    } catch (err) {
+      alert(err.message || "Could not delete user.");
+    }
+  };
 
   const filtered = alumni.filter((a) => {
     const q = search.toLowerCase();

@@ -5,6 +5,7 @@ import AdminPage           from "./pages/AdminPage";
 import BatchPage           from "./pages/BatchPage";
 import AddProfilePage from "./pages/AddProfilePage";
 import ProfilePage from "./pages/ProfilePage";
+import LoginPage from "./pages/LoginPage";
 
 function ProtectedRoute({ role, children }) {
   const userRole = sessionStorage.getItem("role");
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/batch/:year" element={<ProtectedRoute><BatchPage /></ProtectedRoute>} />
         <Route path="/add-profile" element={<ProtectedRoute><AddProfilePage /></ProtectedRoute>} />        
         <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/login/" element={<ProtectedRoute><LoginPage /></ProtectedRoute>} />
 
         {/* Admin only */}
         <Route path="/admin" element={<ProtectedRoute role="admin"><AdminPage /></ProtectedRoute>} />

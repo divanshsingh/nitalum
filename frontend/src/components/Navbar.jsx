@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 
 const BATCHES = [
   { label: "2025–28", path: "/batch/2025" },
@@ -31,6 +31,8 @@ export default function Navbar({ onLogout }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [myUserName, setMyUsername] = useState(sessionStorage.getItem("username"));
+  const userToken = sessionStorage.getItem("userToken"); 
+  const username = sessionStorage.getItem("username");
 
 useEffect(() => {
   const interval = setInterval(() => {
@@ -38,6 +40,13 @@ useEffect(() => {
   }, 300);
   return () => clearInterval(interval);
 }, []);
+
+const handleLogout = () => {
+    // Clear user data but keep the 'role' if you want them to stay past the gate
+    sessionStorage.removeItem("userToken");
+    sessionStorage.removeItem("username");
+    navigate("/home"); // Redirect to home after logout
+  };
 
 
   const isBatchActive = location.pathname.startsWith("/batch");
@@ -161,17 +170,28 @@ useEffect(() => {
         </div>
 
         {/* Add Profile CTA */}
-        <button
-          onClick={() => navigate("/add-profile")}
+        {userToken ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
+          <span onClick={() => navigate(`/profile/${username}`)} style={{ cursor: 'pointer' }}>
+            Hi, {username}
+          </span>
+          <button onClick={handleLogout} 
           style={{
             background: "#111", color: "#fff", fontSize: "12px", fontWeight: 600,
             padding: "8px 18px", borderRadius: "50px", border: "none",
             letterSpacing: "0.5px", fontFamily: "'Courier New', monospace",
             cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.background = "#FF4D4D"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.background = "#111"; e.currentTarget.style.transform = "translateY(0)"; }}
-        >+ Be A Member</button>
+          }}>Logout</button>
+        </div>
+      ) : (
+        <Link to="/add-profile" 
+        style={{
+            background: "#111", color: "#fff", fontSize: "12px", fontWeight: 600,
+            padding: "8px 18px", borderRadius: "50px", border: "none",
+            letterSpacing: "0.5px", fontFamily: "'Courier New', monospace",
+            cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
+          }}>Be a Member</Link>
+      )}
 
         {/* {Profile} */}
         {myUserName && (

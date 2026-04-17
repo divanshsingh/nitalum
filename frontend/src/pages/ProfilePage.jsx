@@ -1,48 +1,6 @@
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
-
-// ─── mock data — replace with API fetch by username ────────────────────────────
-const MOCK_PROFILES = {
-  1: {
-    username: "arjun_sharma",
-    name: "Arjun Sharma",
-    batch: "2015–19",
-    role: "SDE-2",
-    company: "Google",
-    city: "Bangalore",
-    country: "India",
-    email: "arjun@example.com",
-    linkedin: "https://linkedin.com/in/arjunsharma",
-    github: "https://github.com/arjunsharma",
-    portfolio: "https://arjunsharma.dev",
-    leetcode: "https://leetcode.com/u/divanshsingh",
-    phone: "+91 98765 43210",
-    bio: "Passionate engineer who loves building scalable systems. NITA 2019 grad, currently working on distributed infrastructure at Google. Love open source, badminton, and good coffee.",
-    techStack: ["Java", "React", "Kubernetes", "GCP", "PostgreSQL"],
-    resumeUrl: null,
-    image: "https://dh-virid.vercel.app/my-colored-pic.jpeg",
-  },
-  2: {
-    username: "prajakta_nair",
-    name: "Prajakta Nair",
-    batch: "2015–19",
-    role: "Product Manager",
-    company: "Amazon",
-    city: "Hyderabad",
-    country: "India",
-    email: "priya@example.com",
-    linkedin: "https://linkedin.com/in/priyanair",
-    github: "",
-    portfolio: "",
-    leetcode: "",
-    phone: "",
-    bio: "PM at Amazon building the future of e-commerce. Loves design thinking and 0→1 products.",
-    techStack: ["Figma", "SQL", "Python", "Jira"],
-    resumeUrl: null,
-    image: "https://i.pinimg.com/736x/57/53/cd/5753cd744702cd8c5a395dec70ab3e25.jpg",
-  },
-};
 
 const ROLES = [
   "SDE-1","SDE-2","SDE-3","Senior Software Engineer","Staff Engineer",
@@ -56,8 +14,13 @@ const CITIES = [
   "Agartala","Noida","Gurugram","Austin","Seattle","San Francisco",
   "New York","London","Singapore","Toronto","Dubai","Other",
 ];
-const BATCHES = ["2015–19","2016–20","2017–21","2018–22","2019–23","2020–24"];
-
+const BATCHES = [
+  "2006–09", "2007–10", "2008–11", "2009–12", "2010–13",
+  "2011–14", "2012–15", "2013–16", "2014–17", "2015–18",
+  "2016–19", "2017–20", "2018–21", "2019–22", "2020–23",
+  "2021–24", "2022–25", "2023–26", "2024–27", "2025–28",
+  "2026–29", "2027–30", "2028–31"
+];
 // ─── avatar colors ────────────────────────────────────────────────────────────
 const COLORS = ["#FF4D4D","#111","#FFD600","#4ECDC4","#A78BFA","#34D399"];
 const avatarColor = (n) => COLORS[(n - 1) % COLORS.length];
@@ -203,17 +166,53 @@ export default function ProfilePage() {
   const { username }  = useParams();
   const navigate    = useNavigate();
 
-  // TODO: replace with real auth check — for now userNo "1" is "current user"
   const currentUsername = sessionStorage.getItem("username");
   const isOwner = String(username) === String(currentUsername);
 
-  const [profile, setProfile] = useState(
-  Object.values(MOCK_PROFILES).find((p) => p.username === username) || null
-);
+  const [profile, setProfile] = useState(null);
   const [editing, setEditing]   = useState(false);
   const [draft, setDraft]       = useState(null);
   const [saved, setSaved]       = useState(false);
+  const [loading, setLoading]   = useState(true);
   const resumeRef               = useRef(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+
+      try {
+        const response = await fetch(`http://localhost:8081/api/alumni/profile/${username}`);
+        if (!response.ok) {
+          setProfile(null);
+          return;
+        }
+
+        const data = await response.json();
+        setProfile({
+          ...data,
+          techStack: Array.isArray(data.techStack) ? data.techStack : [],
+        });
+      } catch (err) {
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [username]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div style={{ paddingTop: "60px", minHeight: "100vh", background: "#fafaf8", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "1rem" }}>
+          <div style={{ fontSize: "14px", color: "#888", fontFamily: "'Courier New', monospace" }}>
+            Loading profile...
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!profile) {
     return (
