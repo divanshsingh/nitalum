@@ -184,13 +184,40 @@ const handleLogout = () => {
           }}>Logout</button>
         </div>
       ) : (
-        <Link to="/add-profile" 
-        style={{
-            background: "#111", color: "#fff", fontSize: "12px", fontWeight: 600,
-            padding: "8px 18px", borderRadius: "50px", border: "none",
-            letterSpacing: "0.5px", fontFamily: "'Courier New', monospace",
-            cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
-          }}>Be a Member</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <Link
+            to="/login"
+            style={{
+              background: "transparent",
+              color: "#111",
+              fontSize: "12px",
+              fontWeight: 600,
+              padding: "8px 18px",
+              borderRadius: "50px",
+              border: "1px solid #111",
+              letterSpacing: "0.5px",
+              fontFamily: "'Courier New', monospace",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              transition: "all 0.2s",
+              textDecoration: "none",
+            }}
+          >
+            Login
+          </Link>
+          <Link
+            to="/add-profile"
+            style={{
+              background: "#111", color: "#fff", fontSize: "12px", fontWeight: 600,
+              padding: "8px 18px", borderRadius: "50px", border: "none",
+              letterSpacing: "0.5px", fontFamily: "'Courier New', monospace",
+              cursor: "pointer", whiteSpace: "nowrap", transition: "all 0.2s",
+              textDecoration: "none",
+            }}
+          >
+            Be a Member
+          </Link>
+        </div>
       )}
 
         {/* {Profile} */}
@@ -210,17 +237,20 @@ const handleLogout = () => {
   >My Profile</button>
 )}
 
-        {/* Logout */}
-        <button
-          onClick={onLogout}
-          style={{
-            background: "transparent", border: "none", cursor: "pointer",
-            color: "#bbb", fontSize: "12px", fontFamily: "'Courier New', monospace",
-            letterSpacing: "0.5px", transition: "color 0.2s", padding: 0,
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#111")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#bbb")}
-        >Logout</button>       
+        {userToken && (
+          <button
+            onClick={onLogout}
+            style={{
+              background: "transparent", border: "none", cursor: "pointer",
+              color: "#bbb", fontSize: "12px", fontFamily: "'Courier New', monospace",
+              letterSpacing: "0.5px", transition: "color 0.2s", padding: 0,
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#111")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#bbb")}
+          >
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );

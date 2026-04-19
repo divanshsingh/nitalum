@@ -123,4 +123,35 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ msg: "Server error" });
   }
 });
+
+router.put('/profile/update/:username',  async(req, res) => {
+  try{
+  const { username } = req.params;
+  
+  let updateData = { ...req.body };
+
+    // 1. If a new image was uploaded, add the Cloudinary URL to the update object
+    if (req.file) {
+      updateData.image = req.file.path; 
+    }
+
+    // 2. Parse techStack back into an array if it was sent as a string
+    if (typeof updateData.techStack === 'string') {
+      updateData.techStack = JSON.parse(updateData.techStack);
+    }
+
+  const updatedAlumni = await Alumni.findOneAndUpdate(
+      { username: username },
+      { $set: req.body }, 
+      { new: true, runValidators: true }
+    );
+  if (!updatedAlumni) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+  res.json(updatedAlumni); 
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ msg: "Server error while updating profile" });
+  } 
+})
 module.exports = router;

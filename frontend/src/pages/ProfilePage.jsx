@@ -73,6 +73,56 @@ function SectionTitle({ children }) {
   );
 }
 
+function DetailCard({ label, value, icon, accent = false }) {
+  if (!value) return null;
+  return (
+    <div style={{
+      padding: "14px 16px",
+      borderRadius: "14px",
+      border: accent ? "1px solid rgba(255,77,77,0.18)" : "1px solid #ecebe6",
+      background: accent ? "linear-gradient(180deg, rgba(255,77,77,0.06), rgba(255,255,255,0.95))" : "#fafaf8",
+      minHeight: "84px",
+      boxSizing: "border-box",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "10px" }}>
+        <div style={{
+          width: "28px",
+          height: "28px",
+          borderRadius: "9px",
+          background: accent ? "rgba(255,77,77,0.12)" : "#fff",
+          border: accent ? "1px solid rgba(255,77,77,0.18)" : "1px solid #ecebe6",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}>
+          {icon}
+        </div>
+        <span style={{
+          fontSize: "10px",
+          fontWeight: 700,
+          letterSpacing: "1.6px",
+          textTransform: "uppercase",
+          color: accent ? "#FF4D4D" : "#8b8b86",
+          fontFamily: "'Courier New', monospace",
+        }}>
+          {label}
+        </span>
+      </div>
+      <div style={{
+        fontSize: "15px",
+        lineHeight: 1.45,
+        color: "#111",
+        fontWeight: 600,
+        fontFamily: "'Courier New', monospace",
+        wordBreak: "break-word",
+      }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
 function EditInput({ label, value, onChange, type = "text", placeholder }) {
   const [focused, setFocused] = useState(false);
   return (
@@ -231,77 +281,51 @@ export default function ProfilePage() {
 
   const startEdit = () => { setDraft({ ...profile, techStack: [...profile.techStack] }); setEditing(true); setSaved(false); };
   const cancelEdit = () => { setEditing(false); setDraft(null); };
-  const saveEdit  = () => {
-    setProfile({ ...draft });
-    setEditing(false);
-    setDraft(null);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+  const saveEdit  = async () => {
+    try{
+    // Switch from JSON to FormData 
+    const formData = new FormData();
+    
+    // Loop through your draft and add everything to formData
+    Object.keys(draft).forEach((key) => {
+      if (key === 'techStack') {
+        formData.append(key, JSON.stringify(draft[key]));
+      } else {
+        formData.append(key, draft[key]);
+      }
+    });
+    const response = await fetch(`http://localhost:8081/api/alumni/profile/update/${username}`, {
+      method: "PUT",
+      body: formData,
+    });
+    if (response.ok) {
+      const updatedData = await response.json();
+      setProfile(updatedData); // Update UI with data from database
+      setEditing(false);
+      setDraft(null);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } else {
+      const error = await response.json();
+      alert(error.msg || "Failed to update profile");
+    }
+  } catch(err){
+    console.error("Update error:", err);
+    alert("Connection error. Is the server running?");
+  }
   };
 
   const setD = (key) => (e) => setDraft((d) => ({ ...d, [key]: e.target.value }));
   const p    = editing ? draft : profile;
+  const stateOrCountry = p.state || p.country || "";
+  const locationLine = [p.city, stateOrCountry].filter(Boolean).join(", ");
 
   return (
     <Layout>
-      <div style={{ paddingTop: "60px", minHeight: "100vh", background: "#fafaf8" }}>
-
-        {/* ── Page header bar ──────────────────────────────────────────────── */}
-        <div style={{ borderBottom: "1px solid #e8e8e4", padding: "2rem 2.5rem 1.5rem", background: "#fafaf8" }}>
-          <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
-            <div>
-              <p style={{ fontSize: "11px", color: "#FF4D4D", letterSpacing: "3px", textTransform: "uppercase", fontFamily: "'Courier New', monospace", marginBottom: "0.3rem" }}>
-                — @{profile.username}
-              </p>
-              <h1 style={{ fontSize: "clamp(24px, 5vw, 42px)", fontWeight: 900, color: "#111", fontFamily: "'Georgia', serif", margin: 0, letterSpacing: "-1px", lineHeight: 1 }}>
-                {profile.name}
-              </h1>
-            </div>
-
-            {isOwner && !editing && (
-              <button onClick={startEdit} style={{
-                display: "flex", alignItems: "center", gap: "7px",
-                background: "#111", color: "#fff", border: "none",
-                padding: "10px 20px", borderRadius: "50px",
-                fontSize: "13px", fontFamily: "'Courier New', monospace",
-                cursor: "pointer", transition: "background 0.2s",
-              }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#FF4D4D")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "#111")}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                Edit Profile
-              </button>
-            )}
-
-            {editing && (
-              <div style={{ display: "flex", gap: "10px" }}>
-                <button onClick={saveEdit} style={{
-                  background: "#111", color: "#fff", border: "none",
-                  padding: "10px 22px", borderRadius: "50px",
-                  fontSize: "13px", fontFamily: "'Courier New', monospace", cursor: "pointer",
-                  transition: "background 0.2s",
-                }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "#1a7a4a")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "#111")}
-                >Save Changes ✓</button>
-                <button onClick={cancelEdit} style={{
-                  background: "transparent", border: "1px solid #e8e8e4", color: "#888",
-                  padding: "10px 18px", borderRadius: "50px",
-                  fontSize: "13px", fontFamily: "'Courier New', monospace", cursor: "pointer",
-                }}>Cancel</button>
-              </div>
-            )}
-          </div>
-          {saved && (
-            <div style={{ maxWidth: "900px", margin: "0.75rem auto 0", fontSize: "12px", color: "#1a7a4a", fontFamily: "'Courier New', monospace" }}>
-              ✓ Profile saved successfully
-            </div>
-          )}
-        </div>
+      <div style={{ paddingTop: "40px", minHeight: "100vh", background: "#fafaf8" }}>
 
         {/* ── Main content ─────────────────────────────────────────────────── */}
-        <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2.5rem 2.5rem 5rem" }}>
+        <div style={{ maxWidth: "900px", margin: "0 auto", padding: "5rem 2.5rem 5rem" }}>
 
           {/* Hero card: big photo + core info */}
           <div style={{
@@ -337,7 +361,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Right — core details */}
-            <div style={{ padding: "2rem" }}>
+            <div style={{ padding: "2rem", background: "linear-gradient(180deg, #fff 0%, #fcfbf8 100%)" }}>
               {editing ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
                   <EditInput label="Full Name" value={draft.name} onChange={setD("name")} placeholder="Your full name" />
@@ -353,24 +377,50 @@ export default function ProfilePage() {
                   <EditInput label="Phone" value={draft.phone} onChange={setD("phone")} placeholder="+91 98765 43210" />
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px", height: "100%" }}>
-                  {/* Tags row */}
-                  <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-                    <Tag accent>{p.batch}</Tag>
-                    <Tag>{p.role}</Tag>
-                    <Tag>{p.company}</Tag>
+                <div style={{ display: "flex", flexDirection: "column", gap: "20px", height: "100%" }}>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <div style={{ fontSize: "12px", color: "#8b8b86", letterSpacing: "1.7px", textTransform: "uppercase", fontFamily: "'Courier New', monospace," }}>
+                      Alumni Profile
+                    </div>
+                    <div style={{ fontSize: "42px", fontWeight: 900, color: "#111", fontFamily: "'Georgia', serif", letterSpacing: "-1.4px", lineHeight: 0.95, textTransform: "capitalize" }}>
+                      {p.name}
+                    </div>
                   </div>
 
-                  <div>
-                    <div style={{ fontSize: "28px", fontWeight: 900, color: "#111", fontFamily: "'Georgia', serif", letterSpacing: "-0.5px", lineHeight: 1.1 }}>{p.name}</div>
-                    <div style={{ fontSize: "14px", color: "#888", fontFamily: "'Courier New', monospace", marginTop: "4px" }}>{p.role} @ {p.company}</div>
-                  </div>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "auto" }}>
-                    <InfoRow
-                      icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>}
-                      value={p.city && p.country ? `${p.city}, ${p.country}` : p.city || ""}
+                  <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+                    gap: "12px",
+                  }}>
+                    <DetailCard
+                      label="Role"
+                      value={p.role}
+                      accent
+                      icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF4D4D" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21V19a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>}
                     />
+                    <DetailCard
+                      label="Company"
+                      value={p.company}
+                      icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h.01"/><path d="M9 13h.01"/><path d="M9 17h.01"/><path d="M15 13h.01"/><path d="M15 17h.01"/></svg>}
+                    />
+                    <DetailCard
+                      label="Location"
+                      value={locationLine}
+                      icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>}
+                    />
+                    <DetailCard
+                      label="Batch"
+                      value={p.batch}
+                      icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginTop: "auto", paddingTop: "4px" }}>
+                    {/* <InfoRow
+                      icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>}
+                      value={locationLine}
+                    /> */}
                     <InfoRow
                       icon={<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.56 3.29 2 2 0 0 1 3.53 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.5a16 16 0 0 0 6 6l.87-.87a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.5 16z"/></svg>}
                       value={p.phone}
@@ -519,6 +569,59 @@ export default function ProfilePage() {
               <p style={{ fontSize: "12px", color: "#aaa", fontFamily: "'Courier New', monospace", margin: 0 }}>
                 🔒 Email address cannot be changed. Contact admin if needed.
               </p>
+            </div>
+          )}
+        </div>
+                {/* ── Page header bar ──────────────────────────────────────────────── */}
+        <div style={{ borderBottom: "1px solid #e8e8e4", padding: "2rem 2.5rem 1.5rem", background: "#fafaf8" }}>
+          <div style={{ maxWidth: "900px", margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <p style={{ fontSize: "11px", color: "#FF4D4D", letterSpacing: "3px", textTransform: "uppercase", fontFamily: "'Courier New', monospace", marginBottom: "0.3rem" }}>
+                Make your real identity
+              </p>
+              <h2 style={{ fontSize: "clamp(24px, 5vw, 42px)", fontWeight: 900, color: "#111", fontFamily: "'Georgia', serif", margin: 0, letterSpacing: "-1px", lineHeight: 1 }}>
+                 @{profile.username}
+              </h2>
+            </div>
+
+            {isOwner && !editing && (
+              <button onClick={startEdit} style={{
+                display: "flex", alignItems: "center", gap: "7px",
+                background: "#111", color: "#fff", border: "none",
+                padding: "10px 20px", borderRadius: "50px",
+                fontSize: "13px", fontFamily: "'Courier New', monospace",
+                cursor: "pointer", transition: "background 0.2s",
+              }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#FF4D4D")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "#111")}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Edit Profile
+              </button>
+            )}
+
+            {editing && (
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button onClick={saveEdit} style={{
+                  background: "#111", color: "#fff", border: "none",
+                  padding: "10px 22px", borderRadius: "50px",
+                  fontSize: "13px", fontFamily: "'Courier New', monospace", cursor: "pointer",
+                  transition: "background 0.2s",
+                }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#1a7a4a")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#111")}
+                >Save Changes ✓</button>
+                <button onClick={cancelEdit} style={{
+                  background: "transparent", border: "1px solid #e8e8e4", color: "#888",
+                  padding: "10px 18px", borderRadius: "50px",
+                  fontSize: "13px", fontFamily: "'Courier New', monospace", cursor: "pointer",
+                }}>Cancel</button>
+              </div>
+            )}
+          </div>
+          {saved && (
+            <div style={{ maxWidth: "900px", margin: "0.75rem auto 0", fontSize: "12px", color: "#1a7a4a", fontFamily: "'Courier New', monospace" }}>
+              ✓ Profile saved successfully
             </div>
           )}
         </div>
