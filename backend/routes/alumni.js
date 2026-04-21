@@ -124,34 +124,46 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.put('/profile/update/:username',  async(req, res) => {
-  try{
-  const { username } = req.params;
-  
-  let updateData = { ...req.body };
+router.put('/profile/update/:username', upload.fields([
+  { name: 'image', maxCount: 1 }, 
+  { name: 'resumeUrl', maxCount: 1 }
+]), async (req, res) => {
+  try {
+    const { username } = req.params;
+    
+    // req.body contains the text, req.files contains the uploaded files
+    let updateData = { ...req.body };
 
-    // 1. If a new image was uploaded, add the Cloudinary URL to the update object
-    if (req.file) {
-      updateData.image = req.file.path; 
+    // 1. Handle Image Upload
+    if (req.files && req.files.image) {
+      updateData.image = req.files.image[0].path; // Cloudinary URL
     }
 
-    // 2. Parse techStack back into an array if it was sent as a string
+    // 2. Handle Resume Upload
+    if (req.files && req.files.resumeUrl) {
+      updateData.resumeUrl = req.files.resumeUrl[0].path; // Cloudinary URL
+    }
+
+    // 3. Parse techStack
     if (typeof updateData.techStack === 'string') {
       updateData.techStack = JSON.parse(updateData.techStack);
     }
 
-  const updatedAlumni = await Alumni.findOneAndUpdate(
+    // CRITICAL: Save 'updateData', NOT 'req.body'
+    const updatedAlumni = await Alumni.findOneAndUpdate(
       { username: username },
-      { $set: req.body }, 
+      { $set: updateData }, // Use the cleaned data with Cloudinary links
       { new: true, runValidators: true }
     );
-  if (!updatedAlumni) {
+
+    if (!updatedAlumni) {
       return res.status(404).json({ msg: "User not found" });
     }
-  res.json(updatedAlumni); 
-  } catch(err) {
+
+    res.json(updatedAlumni);
+  } catch (err) {
     console.error(err);
     res.status(500).json({ msg: "Server error while updating profile" });
-  } 
-})
+  }
+});
 module.exports = router;
