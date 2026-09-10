@@ -410,6 +410,7 @@ export default function Home() {
           <span>Stories</span>
         </nav>
 
+      
       </section>
     </main>
   );
