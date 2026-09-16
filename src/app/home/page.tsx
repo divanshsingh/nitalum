@@ -69,6 +69,7 @@ export default function HomePage() {
   const [showNav, setShowNav] = useState(true);
   const [communityProgress, setCommunityProgress] = useState(0);
   const [generationProgress, setGenerationProgress] = useState(0);
+  const [batchProgress, setBatchProgress] = useState(0);
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -181,6 +182,62 @@ export default function HomePage() {
     window.removeEventListener("scroll", handleScroll);
   };
 }, []);
+
+useEffect(() => {
+  const section = document.getElementById("batches");
+
+  if (!section) return;
+
+  const handleWheel = (event: WheelEvent) => {
+    const rect = section.getBoundingClientRect();
+
+    // Only lock scrolling when Batches section
+    // is currently occupying the viewport.
+    const isActive =
+      rect.top <= 1 &&
+      rect.bottom >= window.innerHeight - 1;
+
+    if (!isActive) return;
+
+    const delta = event.deltaY;
+
+    // Going DOWN
+    if (delta > 0) {
+      if (batchProgress < 1) {
+        event.preventDefault();
+
+        setBatchProgress((prev) =>
+          Math.min(1, prev + delta * 0.0012)
+        );
+      }
+
+      // progress === 1:
+      // don't prevent default → normal vertical scroll resumes
+    }
+
+    // Going UP
+    if (delta < 0) {
+      if (batchProgress > 0) {
+        event.preventDefault();
+
+        setBatchProgress((prev) =>
+          Math.max(0, prev + delta * 0.0012)
+        );
+      }
+
+      // progress === 0:
+      // don't prevent default → normal vertical scroll resumes
+    }
+  };
+
+  window.addEventListener("wheel", handleWheel, {
+    passive: false,
+  });
+
+  return () => {
+    window.removeEventListener("wheel", handleWheel);
+  };
+}, [batchProgress]);
 
   return (
     <main
@@ -1093,6 +1150,483 @@ export default function HomePage() {
       className="underline-offset-4 hover:bg-[#f3b7d8] hover:underline">
         18 batches
         </a>          
+    </div>
+  </div>
+</section>
+
+{/* =========================
+    BATCHES SECTION
+========================= */}
+
+<section
+  id="batches"
+  className="relative overflow-hidden bg-[#eee8dc]"
+>
+  <div className="sticky top-0 h-screen overflow-hidden">
+
+    {/* HORIZONTAL TRACK */}
+    <div
+      className="flex h-full"
+      style={{
+        width: "500vw",
+        transform: `translateX(-${batchProgress * 400}vw)`,
+      }}
+    >
+
+      {/* =========================
+          BATCH 26
+      ========================= */}
+      <div className="relative flex h-screen w-screen shrink-0 items-center px-10 md:px-16">
+
+        {/* TEXT */}
+        <div className="w-[38%] pr-10">
+
+          <p className="mb-8 text-[11px] uppercase tracking-[0.18em] text-gray-600">
+            03 — THE BATCHES
+          </p>
+
+          <h2
+            className="text-[clamp(70px,8vw,130px)] leading-[0.85] tracking-[-0.05em]"
+            style={{ fontFamily: "var(--font-archivo-black)" }}
+          >
+            MCA '26
+          </h2>
+
+          <p
+            className="mt-8 text-3xl tracking-tight"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            New faces.
+            <br />
+            Same home.
+          </p>
+
+          <p className="mt-6 max-w-sm text-sm leading-relaxed text-gray-600">
+            A fresh chapter begins. Different dreams,
+            same classroom, same corridors,
+            same community.
+          </p>
+
+          <div className="mt-8 flex gap-8 text-[11px] uppercase tracking-[0.15em]">
+            <div>
+              <span className="text-2xl tracking-normal">62</span>
+              <br />
+              MEMBERS
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">21</span>
+              <br />
+              CITIES
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">23</span>
+              <br />
+              COMPANIES
+            </div>
+          </div>
+
+          <a
+            href="/batches/2026"
+            className="mt-10 inline-block text-[11px] uppercase tracking-[0.18em] underline underline-offset-4 transition-opacity hover:opacity-50"
+          >
+            Explore batch →
+          </a>
+        </div>
+
+        {/* PHOTOS */}
+        <div className="relative h-[65vh] w-[62%]">
+
+          {/* PHOTO 1 */}
+          <div className="absolute left-[2%] top-[20%] w-[24%] rotate-[-5deg]">
+            <img
+              src="/images/batch-26-1.jpg"
+              alt="MCA 2026"
+              className="h-[220px] w-full object-cover"
+            />
+          </div>
+
+          {/* MAIN PHOTO */}
+          <div className="absolute left-[28%] top-[8%] w-[48%] rotate-[2deg]">
+            <img
+              src="/images/batch-26-main.jpg"
+              alt="MCA 2026 batch"
+              className="h-[430px] w-full object-cover"
+            />
+          </div>
+
+          {/* PHOTO 2 */}
+          <div className="absolute right-[4%] top-[18%] w-[25%] rotate-[6deg]">
+            <img
+              src="/images/batch-26-2.jpg"
+              alt="MCA 2026"
+              className="h-[270px] w-full object-cover"
+            />
+          </div>
+
+          {/* PHOTO 3 */}
+          <div className="absolute top-[80%] left-[30%] w-[25%] rotate-[-3deg]">
+            <img
+              src="/images/batch-26-3.jpg"
+              alt="MCA 2026"
+              className="h-[190px] w-full object-cover"
+            />
+          </div>
+
+          {/* HANDWRITTEN NOTE */}
+          <p
+            className="absolute left-[20%] top-[4%] rotate-[-5deg] text-2xl"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            New beginnings ↘
+          </p>
+
+        </div>
+      </div>
+
+
+      {/* =========================
+          BATCH 25
+      ========================= */}
+      <div className="relative flex h-screen w-screen shrink-0 items-center px-10 md:px-16">
+
+        {/* TEXT */}
+        <div className="w-[38%] pr-10">
+
+          <p className="mb-8 text-[11px] uppercase tracking-[0.18em] text-gray-600">
+            THE BATCHES
+          </p>
+
+          <h2
+            className="text-[clamp(70px,8vw,130px)] leading-[0.85] tracking-[-0.05em]"
+            style={{ fontFamily: "var(--font-archivo-black)" }}
+          >
+            MCA '25
+          </h2>
+
+          <p
+            className="mt-8 text-3xl"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            More than
+            <br />
+            a batch.
+          </p>
+
+          <p className="mt-6 max-w-sm text-sm leading-relaxed text-gray-600">
+            From late night submissions to
+            lifelong bonds, this batch turned
+            moments into memories.
+          </p>
+
+          <div className="mt-8 flex gap-8 text-[11px] uppercase tracking-[0.15em]">
+            <div>
+              <span className="text-2xl tracking-normal">58</span>
+              <br />
+              MEMBERS
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">17</span>
+              <br />
+              CITIES
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">23</span>
+              <br />
+              COMPANIES
+            </div>
+          </div>
+
+          <a
+            href="/batches/2025"
+            className="mt-10 inline-block text-[11px] uppercase tracking-[0.18em] underline underline-offset-4 transition-opacity hover:opacity-50"
+          >
+            Explore batch →
+          </a>
+        </div>
+
+        {/* PHOTOS */}
+        <div className="relative h-[65vh] w-[62%]">
+
+          <div className="absolute left-[10%] top-[18%] w-[24%] rotate-[-4deg]">
+            <img
+              src="/images/batch-25-1.jpg"
+              alt="MCA 2025"
+              className="h-[190px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute left-[28%] top-[8%] w-[48%] rotate-[2deg]">
+            <img
+              src="/images/batch-25-main.jpg"
+              alt="MCA 2025 batch"
+              className="h-[430px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute right-[5%] top-[70%] w-[25%] rotate-[5deg]">
+            <img
+              src="/images/batch-25-2.jpg"
+              alt="MCA 2025"
+              className="h-[250px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute bottom-[80%] left-[43%] w-[23%] rotate-[-4deg]">
+            <img
+              src="/images/batch-25-3.jpg"
+              alt="MCA 2025"
+              className="h-[190px] w-full object-cover"
+            />
+          </div>
+
+          <p
+            className="absolute left-[18%] top-[3%] rotate-[-5deg] text-2xl"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            Good people.
+            <br />
+            Better days.
+          </p>
+
+        </div>
+      </div>
+
+
+      {/* =========================
+          BATCH 24
+      ========================= */}
+      <div className="relative flex h-screen w-screen shrink-0 items-center px-10 md:px-16">
+
+        <div className="w-[38%] pr-10">
+
+          <p className="mb-8 text-[11px] uppercase tracking-[0.18em] text-gray-600">
+            THE BATCHES
+          </p>
+
+          <h2
+            className="text-[clamp(70px,8vw,130px)] leading-[0.85] tracking-[-0.05em]"
+            style={{ fontFamily: "var(--font-archivo-black)" }}
+          >
+            MCA '24
+          </h2>
+
+          <p
+            className="mt-8 text-3xl"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            Ideas.
+            <br />
+            People.
+            <br />
+            Progress.
+          </p>
+
+          <p className="mt-6 max-w-sm text-sm leading-relaxed text-gray-600">
+            A batch that challenged,
+            created and constantly
+            moved forward.
+          </p>
+
+          <div className="mt-8 flex gap-8 text-[11px] uppercase tracking-[0.15em]">
+            <div>
+              <span className="text-2xl tracking-normal">54</span>
+              <br />
+              MEMBERS
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">19</span>
+              <br />
+              CITIES
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">28</span>
+              <br />
+              COMPANIES
+            </div>
+          </div>
+
+          <a
+            href="/batches/2024"
+            className="mt-10 inline-block text-[11px] uppercase tracking-[0.18em] underline underline-offset-4 transition-opacity hover:opacity-50"
+          >
+            Explore batch →
+          </a>
+        </div>
+
+        <div className="relative h-[65vh] w-[62%]">
+
+          <div className="absolute left-[2%] top-[30%] w-[25%] rotate-[-5deg]">
+            <img
+              src="/images/batch-24-1.jpg"
+              alt="MCA 2024"
+              className="h-[190px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute left-[27%] top-[10%] w-[48%] rotate-[1deg]">
+            <img
+              src="/images/batch-24-main.jpg"
+              alt="MCA 2024 batch"
+              className="h-[420px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute right-[4%] top-[25%] w-[24%] rotate-[6deg]">
+            <img
+              src="/images/batch-24-2.jpg"
+              alt="MCA 2024"
+              className="h-[250px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute top-[80%] left-[43%] w-[22%] rotate-[-3deg]">
+            <img
+              src="/images/batch-24-3.jpg"
+              alt="MCA 2024"
+              className="h-[180px] w-full object-cover"
+            />
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* =========================
+          BATCH 23
+      ========================= */}
+      <div className="relative flex h-screen w-screen shrink-0 items-center px-10 md:px-16">
+
+        <div className="w-[38%] pr-10">
+
+          <p className="mb-8 text-[11px] uppercase tracking-[0.18em] text-gray-600">
+            THE BATCHES
+          </p>
+
+          <h2
+            className="text-[clamp(70px,8vw,130px)] leading-[0.85] tracking-[-0.05em]"
+            style={{ fontFamily: "var(--font-archivo-black)" }}
+          >
+            MCA '23
+          </h2>
+
+          <p
+            className="mt-8 text-3xl"
+            style={{ fontFamily: "var(--font-caveat)" }}
+          >
+            Different paths.
+            <br />
+            Same home.
+          </p>
+
+          <p className="mt-6 max-w-sm text-sm leading-relaxed text-gray-600">
+            New places, new careers,
+            but the same roots that
+            brought everyone together.
+          </p>
+
+          <div className="mt-8 flex gap-8 text-[11px] uppercase tracking-[0.15em]">
+            <div>
+              <span className="text-2xl tracking-normal">51</span>
+              <br />
+              MEMBERS
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">16</span>
+              <br />
+              CITIES
+            </div>
+
+            <div>
+              <span className="text-2xl tracking-normal">24</span>
+              <br />
+              COMPANIES
+            </div>
+          </div>
+
+          <a
+            href="/batches/2023"
+            className="mt-10 inline-block text-[11px] uppercase tracking-[0.18em] underline underline-offset-4 transition-opacity hover:opacity-50"
+          >
+            Explore batch →
+          </a>
+        </div>
+
+        <div className="relative h-[65vh] w-[62%]">
+
+          <div className="absolute left-[7%] top-[25%] w-[24%] rotate-[-6deg]">
+            <img
+              src="/images/batch-23-1.jpg"
+              alt="MCA 2023"
+              className="h-[220px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute left-[27%] top-[7%] w-[48%] rotate-[2deg]">
+            <img
+              src="/images/batch-23-main.jpg"
+              alt="MCA 2023 batch"
+              className="h-[420px] w-full object-cover"
+            />
+          </div>
+
+          <div className="absolute right-[4%] top-[22%] w-[25%] rotate-[5deg]">
+            <img
+              src="/images/batch-23-2.jpg"
+              alt="MCA 2023"
+              className="h-[250px] w-full object-cover"
+            />
+          </div>
+
+        </div>
+      </div>
+
+
+      {/* =========================
+    ALL BATCHES CTA
+========================= */}
+
+<div className="relative flex h-screen w-screen shrink-0 items-center justify-center">
+
+  <div className="text-center">
+
+    <p className="mb-8 text-[11px] uppercase tracking-[0.18em] text-gray-500">
+      THE COMPLETE ARCHIVE
+    </p>
+
+    <h2
+      className="text-[clamp(60px,8vw,120px)] leading-[0.85] tracking-[-0.05em]"
+      style={{ fontFamily: "var(--font-archivo-black)" }}
+    >
+      Your batch is
+      <br />
+      one chapter.
+    </h2>
+
+    <p
+      className="mx-auto mt-8 max-w-md text-2xl"
+      style={{ fontFamily: "var(--font-caveat)" }}
+    >
+      The story continues through every generation.
+    </p>
+
+    <a
+      href="/batches"
+      className="mt-10 inline-block border-b border-black pb-1 text-[11px] uppercase tracking-[0.18em] hover:bg-[#f3b7d8]"
+    >
+      Explore all batches →
+    </a>
+
+  </div>
+
+</div>
+
     </div>
   </div>
 </section>
